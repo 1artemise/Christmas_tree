@@ -2,36 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merry Christmas</title> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Merry Christmas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Times+New+Roman&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Times+New+Roman&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --c-gold: #d4af37;
             --c-cream: #fceea7;
             --c-black: #050505;
+            --c-glass: rgba(20, 20, 20, 0.7);
         }
-        body { margin: 0; overflow: hidden; background-color: var(--c-black); font-family: 'Times New Roman', serif; user-select: none; }
+        body { margin: 0; overflow: hidden; background-color: var(--c-black); font-family: 'Times New Roman', serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         
-        /* UI: Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--c-black); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s ease; }
+        /* --- UI: LOADER --- */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--c-black); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s ease; }
         .spinner { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(212, 175, 55, 0.1); border-top: 2px solid var(--c-gold); animation: spin 1s linear infinite; margin-bottom: 20px; }
         .loading-text { color: var(--c-gold); font-family: 'Cinzel', serif; letter-spacing: 4px; font-size: 14px; }
-        
-        /* UI: Main */
+
+        /* --- UI: LETTER INTRO --- */
+        #letter-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease;
+        }
+        .letter-paper {
+            background: #fffbf0; width: 85%; max-width: 550px; padding: 40px;
+            border: 2px solid var(--c-gold); box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+            text-align: left; transform: translateY(20px); transition: transform 1s ease;
+            position: relative; max-height: 80vh; overflow-y: auto;
+        }
+        .letter-content p {
+            font-family: 'Noto Serif SC', serif; color: #2c2c2c; font-size: 18px; line-height: 1.8; margin-bottom: 20px;
+        }
+        .letter-btn {
+            display: block; margin: 30px auto 0; background: var(--c-gold); color: #000;
+            border: none; padding: 12px 40px; font-family: 'Cinzel', serif; font-size: 16px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .letter-btn:hover { background: var(--c-cream); box-shadow: 0 0 15px var(--c-gold); }
+
+        /* --- UI: MAIN LAYER --- */
         #ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; transition: opacity 0.5s ease; }
         .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
         
         h1 { font-family: 'Cinzel', serif; font-size: 4vw; text-align: center; margin-top: 30px; background: linear-gradient(to bottom, #ffffff 0%, var(--c-gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6)); }
-        
-        #status-bar { position: absolute; top: 30px; right: 40px; color: var(--c-cream); font-family: 'Cinzel', serif; font-size: 16px; border: 1px solid var(--c-gold); padding: 10px 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); transition: all 0.3s; }
+        @media (max-width: 600px) { h1 { font-size: 32px; margin-top: 20px; } }
+
+        #status-bar { position: absolute; top: 30px; right: 40px; color: var(--c-cream); font-family: 'Cinzel', serif; font-size: 16px; border: 1px solid var(--c-gold); padding: 10px 20px; background: var(--c-glass); backdrop-filter: blur(5px); transition: all 0.3s; }
         .status-flash { background: rgba(212, 175, 55, 0.8) !important; color: #000 !important; transform: scale(1.1); }
         
-        /* Gesture Hint */
         #gesture-hint { position: absolute; top: 50%; width: 100%; text-align: center; color: rgba(212, 175, 55, 0.3); font-family: 'Cinzel'; font-size: 80px; pointer-events: none; opacity: 0; transition: opacity 0.5s; transform: translateY(-50%); }
+        @media (max-width: 600px) { #gesture-hint { font-size: 40px; } }
+
+        /* --- UI: MODE SWITCH --- */
+        .mode-switch {
+            position: absolute; top: 30px; left: 40px; pointer-events: auto;
+            display: flex; gap: 10px; background: var(--c-glass); padding: 5px; border: 1px solid var(--c-gold);
+        }
+        .mode-btn {
+            background: transparent; border: none; color: #666; padding: 8px 15px;
+            font-family: 'Cinzel'; cursor: pointer; transition: all 0.3s; border: 1px solid transparent;
+        }
+        .mode-btn.active { color: var(--c-gold); border-color: var(--c-gold); background: rgba(212, 175, 55, 0.1); }
+
+        /* --- UI: MOUSE/TOUCH CONSOLE --- */
+        #mouse-console {
+            position: absolute; bottom: 30px; left: 40px; pointer-events: auto;
+            display: flex; flex-direction: column; gap: 10px;
+            opacity: 0; transform: translateY(20px); transition: all 0.5s;
+        }
+        #mouse-console.visible { opacity: 1; transform: translateY(0); }
+        @media (max-width: 600px) { #mouse-console { left: 50%; transform: translateX(-50%) translateY(20px); bottom: 20px; align-items: center; width: 90%; } #mouse-console.visible { transform: translateX(-50%) translateY(0); } }
         
+        .console-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .console-btn {
+            background: var(--c-glass); border: 1px solid var(--c-gold); color: var(--c-gold);
+            padding: 10px 20px; font-family: 'Cinzel'; font-size: 12px; cursor: pointer;
+            backdrop-filter: blur(5px); transition: all 0.2s; min-width: 70px;
+        }
+        .console-btn:hover { background: rgba(212, 175, 55, 0.3); }
+        .console-btn:active { transform: scale(0.95); }
+        .console-label { color: rgba(255,255,255,0.5); font-size: 10px; margin-bottom: 5px; font-family: sans-serif; }
+
+        /* --- CSS SNOW --- */
+        #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .snowflake {
+            position: absolute; top: -10px; background: white; border-radius: 50%; opacity: 0.6;
+            animation: fall linear infinite;
+        }
+        @keyframes fall { to { transform: translateY(110vh); } }
+
         #webcam-container { position: fixed; bottom: 10px; right: 10px; opacity: 0; pointer-events: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -47,12 +112,51 @@
     </script>
 </head>
 <body>
+    <audio id="bgm" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="loader"><div class="spinner"></div><div class="loading-text">PREPARING SURPRISE...</div></div>
     
+    <div id="snow-container"></div>
+
+    <div id="letter-overlay">
+        <div class="letter-paper">
+            <div class="letter-content">
+                <p>圣诞快乐，亲爱的齐姐和晓童姐：</p>
+                <p>我用代码搭了一个圣诞树，树上有我们的照片。</p>
+                <p>允许摄像头权限之后，你们可以用手势操控圣诞树（比如捏合手指看照片，挥手切换）。</p>
+                <p>当然，如果整不明白，或者在手机上，也可以用鼠标或手指点击操控台。</p>
+                <p>我还埋了一个小彩蛋：试着点一下树顶的星星？✨</p>
+                <p>我想圣诞节的意义不是虚构出一个圣诞老人，是给每个人成为圣诞老人送出惊喜温暖别人的机会，何其有幸。</p>
+            </div>
+            <button class="letter-btn" id="open-gift-btn">OPEN GIFT</button>
+        </div>
+    </div>
+
     <div id="ui-layer">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="btn-gesture">GESTURE</button>
+            <button class="mode-btn" id="btn-mouse">MOUSE/TOUCH</button>
+        </div>
+
         <div id="status-bar">MEMORIES: 0 / 40</div>
         <h1>Merry Christmas</h1>
         <div id="gesture-hint">SWIPE TO BROWSE</div>
+
+        <div id="mouse-console">
+            <div class="console-label">VIEW MODE</div>
+            <div class="console-row">
+                <button class="console-btn" onclick="SceneManager.setMode('TREE')">🌲 TREE</button>
+                <button class="console-btn" onclick="SceneManager.setMode('SCATTER')">❄️ SCATTER</button>
+                <button class="console-btn" onclick="SceneManager.setMode('FOCUS')">🔍 FOCUS</button>
+            </div>
+            <div class="console-label" style="margin-top:10px">GALLERY CONTROL</div>
+            <div class="console-row">
+                <button class="console-btn" onclick="SceneManager.prevPhoto()">⬅️ PREV</button>
+                <button class="console-btn" onclick="SceneManager.nextPhoto()">NEXT ➡️</button>
+            </div>
+        </div>
     </div>
     
     <div id="webcam-container"><video id="webcam" autoplay playsinline></video><canvas id="cv_canvas" width="160" height="120"></canvas></div>
@@ -65,21 +169,81 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
         const CONFIG = {
-            colors: { gold: 0xd4af37, cream: 0xfceea7, red: 0xaa0000, green: 0x003300 },
-            count: { main: 1500, dust: 2500 }, 
-            cameraPos: new THREE.Vector3(0, 2, 55),
+            colors: { gold: 0xd4af37, cream: 0xfceea7, red: 0xaa0000, green: 0x004411 },
+            count: { main: 1600, dust: 2000 }, 
+            cameraPos: new THREE.Vector3(0, 2, isMobile ? 85 : 55), 
             focusPos: new THREE.Vector3(0, 2, 40),
-            totalPhotos: 40 // Set strictly to 40 as requested
+            totalPhotos: 40
         };
 
         const STATE = {
             mode: 'TREE',
+            controlType: 'GESTURE',
             handRotation: { x: 0, y: 0 },
+            targetRotation: { x: 0, y: 0 },
             focusedObject: null,
             photoObjects: [],
             photoIndex: 0,
-            lastSwipeTime: 0
+            lastSwipeTime: 0,
+            isLetterOpen: true
+        };
+
+        // --- MANAGERS ---
+        const UIManager = {
+            init: () => {
+                const letter = document.getElementById('letter-overlay');
+                const btn = document.getElementById('open-gift-btn');
+                const bgm = document.getElementById('bgm');
+
+                const snowCont = document.getElementById('snow-container');
+                for(let i=0; i<40; i++){
+                    const d = document.createElement('div'); d.className = 'snowflake';
+                    d.style.left = Math.random()*100 + '%';
+                    d.style.width = d.style.height = (Math.random()*3+2)+'px';
+                    d.style.animationDuration = (Math.random()*5+8)+'s'; d.style.animationDelay = (Math.random()*5)+'s';
+                    snowCont.appendChild(d);
+                }
+
+                if(isMobile) {
+                    UIManager.setControl('MOUSE');
+                    document.getElementById('btn-gesture').style.display = 'none';
+                    document.getElementById('btn-mouse').innerText = "TOUCH MODE";
+                    document.getElementById('webcam-container').remove();
+                }
+
+                setTimeout(() => { letter.style.opacity = 1; letter.style.pointerEvents = 'auto'; }, 1500);
+
+                btn.addEventListener('click', () => {
+                    letter.style.opacity = 0; letter.style.pointerEvents = 'none';
+                    STATE.isLetterOpen = false;
+                    bgm.volume = 0;
+                    bgm.play().then(() => {
+                        let vol = 0; const fade = setInterval(() => { if(vol < 0.5) { vol += 0.05; bgm.volume = vol; } else clearInterval(fade); }, 200);
+                    }).catch(e => console.log("Audio requires interaction", e));
+                });
+
+                document.getElementById('btn-gesture').addEventListener('click', () => UIManager.setControl('GESTURE'));
+                document.getElementById('btn-mouse').addEventListener('click', () => UIManager.setControl('MOUSE'));
+            },
+            setControl: (type) => {
+                STATE.controlType = type;
+                document.getElementById('btn-gesture').classList.toggle('active', type === 'GESTURE');
+                document.getElementById('btn-mouse').classList.toggle('active', type === 'MOUSE');
+                const consoleEl = document.getElementById('mouse-console');
+                if(type === 'MOUSE') { consoleEl.classList.add('visible'); UIManager.showHint(false); }
+                else { consoleEl.classList.remove('visible'); if(STATE.mode === 'FOCUS') UIManager.showHint(true); }
+            },
+            updateCount: (idx, total) => {
+                const el = document.getElementById('status-bar');
+                el.innerText = `MEMORIES: ${idx + 1} / ${total}`;
+                el.classList.add('status-flash'); setTimeout(() => el.classList.remove('status-flash'), 300);
+            },
+            showHint: (show) => {
+                document.getElementById('gesture-hint').style.opacity = (show && STATE.controlType === 'GESTURE') ? 1 : 0;
+            }
         };
 
         const Utils = {
@@ -90,20 +254,37 @@
                 ctx.fillStyle = '#c00'; ctx.beginPath();
                 for(let i=-64; i<128; i+=16) { ctx.moveTo(i,0); ctx.lineTo(i+8,0); ctx.lineTo(i+72,64); ctx.lineTo(i+64,64); }
                 ctx.fill();
-                const t = new THREE.CanvasTexture(c);
-                t.wrapS = t.wrapT = THREE.RepeatWrapping;
-                return t;
+                const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
             }
         };
 
-        const UI = {
-            updateCount: (idx, total) => {
-                const el = document.getElementById('status-bar');
-                el.innerText = `MEMORIES: ${idx + 1} / ${total}`;
-                el.classList.add('status-flash'); setTimeout(() => el.classList.remove('status-flash'), 300);
-            },
-            showHint: (show) => document.getElementById('gesture-hint').style.opacity = show ? 1 : 0
-        };
+        class Explosion {
+            constructor(scene, pos) {
+                this.scene = scene; this.particles = [];
+                const geo = new THREE.BufferGeometry();
+                const mat = new THREE.PointsMaterial({ color: CONFIG.colors.gold, size: 0.5, transparent: true, blending: THREE.AdditiveBlending });
+                for(let i=0; i<150; i++) {
+                    this.particles.push({
+                        vel: new THREE.Vector3((Math.random()-0.5)*3, (Math.random()-0.5)*3, (Math.random()-0.5)*3), life: 1.0
+                    });
+                }
+                geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(450).fill(0), 3));
+                this.mesh = new THREE.Points(geo, mat); this.mesh.position.copy(pos); scene.add(this.mesh);
+            }
+            update() {
+                const pos = this.mesh.geometry.attributes.position.array; let alive = false;
+                for(let i=0; i<this.particles.length; i++) {
+                    const p = this.particles[i];
+                    if(p.life > 0) {
+                        alive = true; p.life -= 0.015; p.vel.y -= 0.03;
+                        pos[i*3]+=p.vel.x; pos[i*3+1]+=p.vel.y; pos[i*3+2]+=p.vel.z;
+                    }
+                }
+                this.mesh.geometry.attributes.position.needsUpdate = true; this.mesh.material.opacity -= 0.01;
+                if(!alive || this.mesh.material.opacity <= 0) { this.scene.remove(this.mesh); return false; }
+                return true;
+            }
+        }
 
         class Ornament {
             constructor(type, geometry, material) {
@@ -117,27 +298,23 @@
             update() {
                 this.mesh.position.lerp(this.targetPos, 0.08);
                 if (STATE.mode === 'SCATTER') {
-                    this.mesh.rotation.x += this.rotSpeed.x;
-                    this.mesh.rotation.y += this.rotSpeed.y;
+                    this.mesh.rotation.x += this.rotSpeed.x; this.mesh.rotation.y += this.rotSpeed.y;
                 } else if (STATE.mode === 'TREE') {
                     this.mesh.rotation.y = -Math.atan2(this.mesh.position.z, this.mesh.position.x) + Math.PI/2;
                     if(this.type !== 'PHOTO') this.mesh.rotation.y += performance.now() * 0.0005;
                 } else if (STATE.mode === 'FOCUS') {
-                     if (this === STATE.focusedObject) {
-                         this.mesh.lookAt(CONFIG.cameraPos); this.mesh.rotation.z = 0;
-                     } else if (this.type !== 'PHOTO') {
-                         this.mesh.rotation.y += 0.005;
-                     }
+                     if (this === STATE.focusedObject) { this.mesh.lookAt(CONFIG.cameraPos); this.mesh.rotation.z = 0; }
+                     else if (this.type !== 'PHOTO') { this.mesh.rotation.y += 0.005; }
                 }
             }
         }
 
         class VisionManager {
             constructor() {
-                this.video = document.getElementById('webcam');
-                this.lastVideoTime = -1; this.handLandmarker = null; this.lastHandX = 0.5;
+                this.video = document.getElementById('webcam'); this.lastVideoTime = -1; this.handLandmarker = null; this.lastHandX = 0.5;
             }
             async init() {
+                if(isMobile) return;
                 try {
                     const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
                     this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
@@ -156,8 +333,9 @@
                 } requestAnimationFrame(() => this.predictWebcam());
             }
             processGestures(marks) {
+                if (STATE.controlType !== 'GESTURE' || STATE.isLetterOpen) return;
                 const x = marks[9].x, y = marks[9].y;
-                STATE.handRotation.y = (x - 0.5) * 2.5; STATE.handRotation.x = (y - 0.5) * 1.5;
+                STATE.targetRotation.y = (x - 0.5) * 2.5; STATE.targetRotation.x = (y - 0.5) * 1.5;
                 const pinch = Math.hypot(marks[4].x - marks[8].x, marks[4].y - marks[8].y) < 0.05;
                 const fist = Math.hypot(marks[12].x - marks[0].x, marks[12].y - marks[0].y) < 0.25;
                 const open = Math.hypot(marks[12].x - marks[0].x, marks[12].y - marks[0].y) > 0.4;
@@ -169,9 +347,7 @@
                 if (STATE.mode === 'FOCUS' && open) {
                     if (performance.now() - STATE.lastSwipeTime > 1000) {
                         const dx = x - this.lastHandX;
-                        if (Math.abs(dx) > 0.03) { 
-                            dx < -0.03 ? SceneManager.nextPhoto() : SceneManager.prevPhoto();
-                        }
+                        if (Math.abs(dx) > 0.03) { dx < -0.03 ? SceneManager.nextPhoto() : SceneManager.prevPhoto(); }
                     }
                 }
                 this.lastHandX = this.lastHandX * 0.5 + x * 0.5;
@@ -180,20 +356,15 @@
 
         class Application {
             constructor() {
-                this.objects = [];
-                this.initThree();
-                this.initContent(); 
-                this.initEvents();
+                this.objects = []; this.explosions = [];
+                this.initThree(); this.initContent(); this.initEvents();
+                UIManager.init();
                 this.vision = new VisionManager(); this.vision.init();
-                
-                // NEW: Auto load photos
-                this.loadPreloadedPhotos();
-
-                this.animate();
+                this.loadPreloadedPhotos(); this.animate();
             }
 
             initThree() {
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.toneMapping = THREE.ReinhardToneMapping; this.renderer.toneMappingExposure = 2.0;
                 this.renderer.shadowMap.enabled = true;
@@ -208,6 +379,7 @@
                 this.composer = new EffectComposer(this.renderer);
                 this.composer.addPass(new RenderPass(this.scene, this.camera));
                 this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.35, 0.5, 0.8));
+                this.raycaster = new THREE.Raycaster(); this.mouse = new THREE.Vector2();
             }
 
             initContent() {
@@ -218,17 +390,18 @@
                 
                 const mats = {
                     gold: new THREE.MeshStandardMaterial({ color: CONFIG.colors.gold, roughness: 0.2, metalness: 0.9 }),
-                    green: new THREE.MeshStandardMaterial({ color: CONFIG.colors.green, roughness: 0.8, metalness: 0.2 }),
+                    green: new THREE.MeshStandardMaterial({ color: CONFIG.colors.green, roughness: 0.7, metalness: 0.1 }),
                     redPhys: new THREE.MeshPhysicalMaterial({ color: CONFIG.colors.red, roughness: 0.2, metalness: 0.4, clearcoat: 1.0, clearcoatRoughness: 0.1 }),
                     cane: new THREE.MeshStandardMaterial({ map: Utils.createCandyCaneTexture(), roughness: 0.3 })
                 };
 
+                // --- FIXED COLOR DISTRIBUTION (Green & Gold Dominant) ---
                 for (let i = 0; i < CONFIG.count.main; i++) {
-                    let type, geo, mat;
-                    const r = Math.random();
-                    if (r < 0.15) { type='CANE'; geo=caneGeo; mat=mats.cane; }
-                    else if (r < 0.6) { type='BOX'; geo=boxGeo; mat=Math.random()>0.5?mats.gold:mats.green; }
-                    else { type='SPHERE'; geo=sphereGeo; mat=Math.random()>0.5?mats.gold:mats.redPhys; }
+                    let type, geo, mat; const r = Math.random();
+                    if (r < 0.10) { type='CANE'; geo=caneGeo; mat=mats.cane; } // 10% Cane
+                    else if (r < 0.50) { type='BOX'; geo=boxGeo; mat=mats.green; } // 40% Green Box
+                    else if (r < 0.85) { type=Math.random()>0.5?'BOX':'SPHERE'; geo=type==='BOX'?boxGeo:sphereGeo; mat=mats.gold; } // 35% Gold
+                    else { type='SPHERE'; geo=sphereGeo; mat=mats.redPhys; } // 15% Red Sphere
                     const obj = new Ornament(type, geo, mat);
                     this.mainGroup.add(obj.mesh); this.objects.push(obj);
                 }
@@ -236,45 +409,32 @@
                 const dGeo = new THREE.BufferGeometry();
                 const dPos = new Float32Array(CONFIG.count.dust * 3).map(() => (Math.random()-0.5)*90);
                 dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
-                this.scene.add(new THREE.Points(dGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending })));
+                // Tint dust gold
+                this.scene.add(new THREE.Points(dGeo, new THREE.PointsMaterial({ color: 0xffeebb, size: 0.2, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending })));
+                
+                const triggerGeo = new THREE.SphereGeometry(4, 16, 16);
+                this.starTrigger = new THREE.Mesh(triggerGeo, new THREE.MeshBasicMaterial({ visible: false }));
+                this.starTrigger.position.set(0, 20, 0); this.mainGroup.add(this.starTrigger);
                 this.recalculateLayouts('TREE');
             }
 
-            // --- AUTO LOAD PHOTOS ---
             loadPreloadedPhotos() {
-                const loader = new THREE.TextureLoader();
-                let loadedCount = 0;
-
+                const loader = new THREE.TextureLoader(); let loadedCount = 0;
                 for(let i=1; i<=CONFIG.totalPhotos; i++) {
                     loader.load(`photos/${i}.jpg`, (tex) => {
-                        tex.colorSpace = THREE.SRGBColorSpace;
-                        this.createPhotoFrame(tex);
-                        loadedCount++;
-                        
-                        // Hide loader only when enough photos are loaded (e.g., 50% or all)
-                        if(loadedCount === CONFIG.totalPhotos) {
-                            setTimeout(() => document.getElementById('loader').style.opacity = 0, 500);
-                            setTimeout(() => document.getElementById('loader').remove(), 1500);
-                        }
-                    }, undefined, (err) => {
-                        console.warn(`Could not load photo ${i}.jpg`);
-                    });
+                        tex.colorSpace = THREE.SRGBColorSpace; tex.center.set(0.5,0.5);
+                        this.createPhotoFrame(tex); loadedCount++;
+                        if(loadedCount === CONFIG.totalPhotos) { setTimeout(() => { document.getElementById('loader').style.opacity = 0; setTimeout(() => document.getElementById('loader').remove(), 1500); }, 500); }
+                    }, undefined, () => console.warn(`Error loading ${i}.jpg`));
                 }
-                // Fallback: remove loader after 5s even if photos fail
-                setTimeout(() => {
-                   const l = document.getElementById('loader');
-                   if(l) { l.style.opacity = 0; setTimeout(()=>l.remove(), 1000); }
-                }, 5000);
+                setTimeout(() => { const l=document.getElementById('loader'); if(l){l.style.opacity=0; setTimeout(()=>l.remove(),1000);} }, 5000);
             }
 
             createPhotoFrame(tex) {
                 const geo = new THREE.BoxGeometry(3, 3, 0.1);
                 const gold = new THREE.MeshStandardMaterial({ color: CONFIG.colors.gold, roughness: 0.3, metalness: 1 });
-                // Fix texture aspect ratio (simple crop to square logic)
-                tex.center.set(0.5, 0.5);
                 const obj = new Ornament('PHOTO', geo, [gold, gold, gold, gold, new THREE.MeshBasicMaterial({ map: tex }), gold]);
                 this.mainGroup.add(obj.mesh); this.objects.push(obj); STATE.photoObjects.push(obj);
-                
                 document.getElementById('status-bar').innerText = `MEMORIES: ${STATE.photoObjects.length} / ${CONFIG.totalPhotos}`;
                 this.recalculateLayouts(STATE.mode);
             }
@@ -283,23 +443,20 @@
             prevPhoto() { if(STATE.photoObjects.length) { STATE.photoIndex = (STATE.photoIndex - 1 + STATE.photoObjects.length) % STATE.photoObjects.length; this.updateFocusTarget(); }}
             updateFocusTarget() {
                 STATE.lastSwipeTime = performance.now(); STATE.focusedObject = STATE.photoObjects[STATE.photoIndex];
-                UI.updateCount(STATE.photoIndex, STATE.photoObjects.length); this.recalculateLayouts('FOCUS');
+                UIManager.updateCount(STATE.photoIndex, STATE.photoObjects.length); this.recalculateLayouts('FOCUS');
             }
             setMode(mode) {
                 STATE.mode = mode;
-                UI.showHint(mode === 'FOCUS');
+                UIManager.showHint(mode === 'FOCUS');
                 if(mode==='FOCUS' && !STATE.focusedObject && STATE.photoObjects.length) { STATE.focusedObject = STATE.photoObjects[0]; STATE.photoIndex=0; }
                 this.recalculateLayouts(mode);
             }
 
             recalculateLayouts(mode) {
-                // Logic identical to restoration version
                 STATE.photoObjects.forEach((obj, i) => {
                     if (mode === 'TREE') {
-                        const t = i / STATE.photoObjects.length || 0;
-                        const h = (t * 38) - 19;
-                        const r = (12 * (1 - (h+20)/40)) + 4; 
-                        const a = t * 18 * Math.PI;
+                        const t = i / STATE.photoObjects.length || 0; const h = (t * 38) - 19;
+                        const r = (12 * (1 - (h+20)/40)) + 4; const a = t * 18 * Math.PI;
                         obj.targetPos.set(Math.cos(a)*r, h, Math.sin(a)*r); obj.mesh.scale.setScalar(1);
                     } else if (mode === 'FOCUS') {
                         if (obj === STATE.focusedObject) { obj.targetPos.copy(CONFIG.focusPos); obj.mesh.scale.setScalar(4.5); }
@@ -311,7 +468,6 @@
                         }
                     } else { obj.targetPos.setFromSphericalCoords(18, Math.random()*Math.PI, Math.random()*Math.PI*2); obj.mesh.scale.setScalar(1); }
                 });
-
                 let pIdx = 0;
                 this.objects.forEach(obj => {
                     if(obj.type === 'PHOTO') return;
@@ -320,11 +476,8 @@
                         const r = (12 * (1 - (h+20)/40) + 1) * (0.1 + Math.random()*0.9); 
                         const a = t * 55 * Math.PI + Math.random();
                         obj.targetPos.set(Math.cos(a)*r, h, Math.sin(a)*r);
-                    } else if (mode === 'FOCUS') {
-                         obj.targetPos.set((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*60 - 30);
-                    } else {
-                        obj.targetPos.setFromSphericalCoords(5 + Math.random()*15, Math.random()*Math.PI, Math.random()*Math.PI*2);
-                    }
+                    } else if (mode === 'FOCUS') { obj.targetPos.set((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*60 - 30); }
+                    else { obj.targetPos.setFromSphericalCoords(5 + Math.random()*15, Math.random()*Math.PI, Math.random()*Math.PI*2); }
                     pIdx++;
                 });
             }
@@ -332,12 +485,33 @@
             initEvents() {
                 window.addEventListener('resize', () => { this.camera.aspect = window.innerWidth/window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); this.composer.setSize(window.innerWidth, window.innerHeight); });
                 window.addEventListener('keydown', e => { if(e.key==='ArrowRight')this.nextPhoto(); if(e.key==='ArrowLeft')this.prevPhoto(); });
+                
+                const handleInput = (x, y) => {
+                    if(STATE.controlType === 'MOUSE' && !STATE.isLetterOpen) {
+                        STATE.targetRotation.y = (x - 0.5) * 2.5; STATE.targetRotation.x = (y - 0.5) * 1.5;
+                    }
+                };
+                window.addEventListener('mousemove', e => handleInput(e.clientX/window.innerWidth, e.clientY/window.innerHeight));
+                window.addEventListener('touchmove', e => {
+                    if(e.touches.length > 0) handleInput(e.touches[0].clientX/window.innerWidth, e.touches[0].clientY/window.innerHeight);
+                }, { passive: false });
+
+                const handleClick = (clientX, clientY) => {
+                    this.mouse.x = (clientX / window.innerWidth) * 2 - 1; this.mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+                    this.raycaster.setFromCamera(this.mouse, this.camera);
+                    if(this.raycaster.intersectObject(this.starTrigger).length > 0) this.explosions.push(new Explosion(this.scene, this.starTrigger.position));
+                };
+                window.addEventListener('click', e => handleClick(e.clientX, e.clientY));
+                window.addEventListener('touchstart', e => { if(e.touches.length > 0) handleClick(e.touches[0].clientX, e.touches[0].clientY); });
             }
+
             animate() {
                 requestAnimationFrame(() => this.animate());
-                this.mainGroup.rotation.y = THREE.MathUtils.lerp(this.mainGroup.rotation.y, STATE.handRotation.y * 0.3, 0.05);
-                this.mainGroup.rotation.x = THREE.MathUtils.lerp(this.mainGroup.rotation.x, STATE.handRotation.x * 0.1, 0.05);
+                STATE.handRotation.x = THREE.MathUtils.lerp(STATE.handRotation.x, STATE.targetRotation.x, 0.05);
+                STATE.handRotation.y = THREE.MathUtils.lerp(STATE.handRotation.y, STATE.targetRotation.y, 0.05);
+                this.mainGroup.rotation.y = STATE.handRotation.y * 0.5; this.mainGroup.rotation.x = STATE.handRotation.x * 0.2;
                 this.objects.forEach(o => o.update());
+                this.explosions = this.explosions.filter(e => e.update());
                 this.composer.render();
             }
         }
