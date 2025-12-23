@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Merry Christmas</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,91 +14,89 @@
             --c-gold: #d4af37;
             --c-cream: #fceea7;
             --c-black: #050505;
-            --c-glass: rgba(20, 20, 20, 0.7);
+            --c-glass: rgba(20, 20, 20, 0.85);
         }
-        body { margin: 0; overflow: hidden; background-color: var(--c-black); font-family: 'Times New Roman', serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* 使用 dvh (Dynamic Viewport Height) 解决 iOS Safari 地址栏遮挡问题 */
+        body { margin: 0; overflow: hidden; background-color: var(--c-black); font-family: 'Times New Roman', serif; user-select: none; -webkit-tap-highlight-color: transparent; height: 100dvh; }
         
         /* --- UI: LOADER --- */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--c-black); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s ease; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--c-black); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         .spinner { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(212, 175, 55, 0.1); border-top: 2px solid var(--c-gold); animation: spin 1s linear infinite; margin-bottom: 20px; }
         .loading-text { color: var(--c-gold); font-family: 'Cinzel', serif; letter-spacing: 4px; font-size: 14px; }
 
         /* --- UI: LETTER INTRO --- */
         #letter-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
             background: rgba(0,0,0,0.95); z-index: 9000;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
         }
         .letter-paper {
-            background: #fffbf0; width: 85%; max-width: 550px; padding: 40px;
+            background: #fffbf0; width: 85%; max-width: 550px; padding: 30px;
             border: 2px solid var(--c-gold); box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
             text-align: left; transform: translateY(20px); transition: transform 1s ease;
-            position: relative; max-height: 80vh; overflow-y: auto;
+            position: relative; max-height: 80dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
         .letter-content p {
-            font-family: 'Noto Serif SC', serif; color: #2c2c2c; font-size: 18px; line-height: 1.8; margin-bottom: 20px;
+            font-family: 'Noto Serif SC', serif; color: #2c2c2c; font-size: 16px; line-height: 1.6; margin-bottom: 15px;
         }
         .letter-btn {
-            display: block; margin: 30px auto 0; background: var(--c-gold); color: #000;
+            display: block; margin: 20px auto 0; background: var(--c-gold); color: #000;
             border: none; padding: 12px 40px; font-family: 'Cinzel', serif; font-size: 16px; font-weight: bold;
             cursor: pointer; transition: all 0.3s;
         }
-        .letter-btn:hover { background: var(--c-cream); box-shadow: 0 0 15px var(--c-gold); }
+        .letter-btn:active { transform: scale(0.95); }
 
         /* --- UI: MAIN LAYER --- */
-        #ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; transition: opacity 0.5s ease; }
+        #ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; pointer-events: none; z-index: 10; transition: opacity 0.5s ease; }
         .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
         
-        h1 { font-family: 'Cinzel', serif; font-size: 4vw; text-align: center; margin-top: 30px; background: linear-gradient(to bottom, #ffffff 0%, var(--c-gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6)); }
-        @media (max-width: 600px) { h1 { font-size: 32px; margin-top: 20px; } }
+        h1 { font-family: 'Cinzel', serif; font-size: 8vw; text-align: center; margin-top: 40px; background: linear-gradient(to bottom, #ffffff 0%, var(--c-gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6)); pointer-events: none;}
+        @media (min-width: 600px) { h1 { font-size: 4vw; margin-top: 30px; } }
 
-        #status-bar { position: absolute; top: 30px; right: 40px; color: var(--c-cream); font-family: 'Cinzel', serif; font-size: 16px; border: 1px solid var(--c-gold); padding: 10px 20px; background: var(--c-glass); backdrop-filter: blur(5px); transition: all 0.3s; }
+        #status-bar { position: absolute; top: 20px; right: 20px; color: var(--c-cream); font-family: 'Cinzel', serif; font-size: 12px; border: 1px solid var(--c-gold); padding: 8px 15px; background: var(--c-glass); backdrop-filter: blur(5px); transition: all 0.3s; }
         .status-flash { background: rgba(212, 175, 55, 0.8) !important; color: #000 !important; transform: scale(1.1); }
         
-        #gesture-hint { position: absolute; top: 50%; width: 100%; text-align: center; color: rgba(212, 175, 55, 0.3); font-family: 'Cinzel'; font-size: 80px; pointer-events: none; opacity: 0; transition: opacity 0.5s; transform: translateY(-50%); }
-        @media (max-width: 600px) { #gesture-hint { font-size: 40px; } }
+        #gesture-hint { position: absolute; top: 50%; width: 100%; text-align: center; color: rgba(212, 175, 55, 0.3); font-family: 'Cinzel'; font-size: 40px; pointer-events: none; opacity: 0; transition: opacity 0.5s; transform: translateY(-50%); }
 
         /* --- UI: MODE SWITCH --- */
         .mode-switch {
-            position: absolute; top: 30px; left: 40px; pointer-events: auto;
-            display: flex; gap: 10px; background: var(--c-glass); padding: 5px; border: 1px solid var(--c-gold);
+            position: absolute; top: 20px; left: 20px; pointer-events: auto;
+            display: flex; gap: 5px; background: var(--c-glass); padding: 4px; border: 1px solid var(--c-gold);
         }
         .mode-btn {
-            background: transparent; border: none; color: #666; padding: 8px 15px;
-            font-family: 'Cinzel'; cursor: pointer; transition: all 0.3s; border: 1px solid transparent;
+            background: transparent; border: none; color: #888; padding: 6px 10px;
+            font-family: 'Cinzel'; font-size: 10px; cursor: pointer; transition: all 0.3s;
         }
-        .mode-btn.active { color: var(--c-gold); border-color: var(--c-gold); background: rgba(212, 175, 55, 0.1); }
+        .mode-btn.active { color: var(--c-gold); background: rgba(212, 175, 55, 0.15); font-weight: bold; }
 
         /* --- UI: MOUSE/TOUCH CONSOLE --- */
         #mouse-console {
-            position: absolute; bottom: 30px; left: 40px; pointer-events: auto;
-            display: flex; flex-direction: column; gap: 10px;
-            opacity: 0; transform: translateY(20px); transition: all 0.5s;
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); pointer-events: auto;
+            display: flex; flex-direction: column; gap: 10px; opacity: 0; transition: all 0.5s;
+            width: 90%; max-width: 400px; align-items: center;
         }
-        #mouse-console.visible { opacity: 1; transform: translateY(0); }
-        @media (max-width: 600px) { #mouse-console { left: 50%; transform: translateX(-50%) translateY(20px); bottom: 20px; align-items: center; width: 90%; } #mouse-console.visible { transform: translateX(-50%) translateY(0); } }
+        #mouse-console.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
         
-        .console-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .console-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; }
         .console-btn {
             background: var(--c-glass); border: 1px solid var(--c-gold); color: var(--c-gold);
-            padding: 10px 20px; font-family: 'Cinzel'; font-size: 12px; cursor: pointer;
-            backdrop-filter: blur(5px); transition: all 0.2s; min-width: 70px;
+            padding: 10px 0; width: 30%; font-family: 'Cinzel'; font-size: 11px; cursor: pointer;
+            backdrop-filter: blur(5px); transition: background 0.2s;
         }
-        .console-btn:hover { background: rgba(212, 175, 55, 0.3); }
-        .console-btn:active { transform: scale(0.95); }
-        .console-label { color: rgba(255,255,255,0.5); font-size: 10px; margin-bottom: 5px; font-family: sans-serif; }
+        .console-btn:active { background: rgba(212, 175, 55, 0.3); }
+        .console-label { color: rgba(255,255,255,0.4); font-size: 9px; margin-bottom: 2px; font-family: sans-serif; letter-spacing: 1px; }
 
         /* --- CSS SNOW --- */
-        #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; pointer-events: none; z-index: 5; }
         .snowflake {
             position: absolute; top: -10px; background: white; border-radius: 50%; opacity: 0.6;
             animation: fall linear infinite;
         }
         @keyframes fall { to { transform: translateY(110vh); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         #webcam-container { position: fixed; bottom: 10px; right: 10px; opacity: 0; pointer-events: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
     <script type="importmap">
@@ -117,7 +115,6 @@
     </audio>
 
     <div id="loader"><div class="spinner"></div><div class="loading-text">PREPARING SURPRISE...</div></div>
-    
     <div id="snow-container"></div>
 
     <div id="letter-overlay">
@@ -125,8 +122,8 @@
             <div class="letter-content">
                 <p>圣诞快乐，亲爱的齐姐和晓童姐：</p>
                 <p>我用代码搭了一个圣诞树，树上有我们的照片。</p>
-                <p>允许摄像头权限之后，你们可以用手势操控圣诞树（比如捏合手指看照片，挥手切换）。</p>
-                <p>当然，如果整不明白，或者在手机上，也可以用鼠标或手指点击操控台。</p>
+                <p>允许摄像头权限之后，你们可以用手势操控圣诞树（比如捏合手指看照片，挥手切换）</p>
+                <p>当然，如果整不明白，或者在手机上，也可以用鼠标或手指点击操控台。用键盘的左右键切换照片，照片会跟随鼠标移动</p>
                 <p>我还埋了一个小彩蛋：试着点一下树顶的星星？✨</p>
                 <p>我想圣诞节的意义不是虚构出一个圣诞老人，是给每个人成为圣诞老人送出惊喜温暖别人的机会，何其有幸。</p>
             </div>
@@ -137,7 +134,7 @@
     <div id="ui-layer">
         <div class="mode-switch">
             <button class="mode-btn active" id="btn-gesture">GESTURE</button>
-            <button class="mode-btn" id="btn-mouse">MOUSE/TOUCH</button>
+            <button class="mode-btn" id="btn-mouse">TOUCH</button>
         </div>
 
         <div id="status-bar">MEMORIES: 0 / 40</div>
@@ -169,12 +166,14 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
+        // Detect Mobile User Agent
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
         const CONFIG = {
             colors: { gold: 0xd4af37, cream: 0xfceea7, red: 0xaa0000, green: 0x004411 },
-            count: { main: 1600, dust: 2000 }, 
-            cameraPos: new THREE.Vector3(0, 2, isMobile ? 85 : 55), 
+            count: { main: 1500, dust: 2000 }, 
+            // iOS Optimization: Move camera further back for vertical screens
+            cameraPos: new THREE.Vector3(0, 2, isMobile ? 90 : 55), 
             focusPos: new THREE.Vector3(0, 2, 40),
             totalPhotos: 40
         };
@@ -191,13 +190,13 @@
             isLetterOpen: true
         };
 
-        // --- MANAGERS ---
         const UIManager = {
             init: () => {
                 const letter = document.getElementById('letter-overlay');
                 const btn = document.getElementById('open-gift-btn');
                 const bgm = document.getElementById('bgm');
 
+                // Generate Snow
                 const snowCont = document.getElementById('snow-container');
                 for(let i=0; i<40; i++){
                     const d = document.createElement('div'); d.className = 'snowflake';
@@ -207,22 +206,29 @@
                     snowCont.appendChild(d);
                 }
 
+                // Force Touch Mode on Mobile
                 if(isMobile) {
                     UIManager.setControl('MOUSE');
                     document.getElementById('btn-gesture').style.display = 'none';
                     document.getElementById('btn-mouse').innerText = "TOUCH MODE";
-                    document.getElementById('webcam-container').remove();
+                    const wc = document.getElementById('webcam-container');
+                    if(wc) wc.remove(); // Remove webcam DOM entirely to save memory
                 }
 
-                setTimeout(() => { letter.style.opacity = 1; letter.style.pointerEvents = 'auto'; }, 1500);
+                // Show letter
+                setTimeout(() => { letter.style.opacity = 1; letter.style.pointerEvents = 'auto'; }, 1000);
 
+                // Open Gift & iOS Audio Unlock
                 btn.addEventListener('click', () => {
-                    letter.style.opacity = 0; letter.style.pointerEvents = 'none';
+                    letter.style.opacity = 0; 
+                    letter.style.pointerEvents = 'none';
                     STATE.isLetterOpen = false;
-                    bgm.volume = 0;
-                    bgm.play().then(() => {
-                        let vol = 0; const fade = setInterval(() => { if(vol < 0.5) { vol += 0.05; bgm.volume = vol; } else clearInterval(fade); }, 200);
-                    }).catch(e => console.log("Audio requires interaction", e));
+                    
+                    // iOS Audio Trigger Hack
+                    bgm.volume = 0.6;
+                    // Need to load before play on some iOS versions
+                    bgm.load();
+                    bgm.play().catch(e => console.log("Audio requires interaction", e));
                 });
 
                 document.getElementById('btn-gesture').addEventListener('click', () => UIManager.setControl('GESTURE'));
@@ -314,7 +320,8 @@
                 this.video = document.getElementById('webcam'); this.lastVideoTime = -1; this.handLandmarker = null; this.lastHandX = 0.5;
             }
             async init() {
-                if(isMobile) return;
+                // Strictly disable Vision on Mobile to save memory/battery
+                if(isMobile) return; 
                 try {
                     const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
                     this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
@@ -366,6 +373,8 @@
             initThree() {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
+                // iOS Optimization: Limit pixel ratio to max 2 to prevent crash
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.toneMapping = THREE.ReinhardToneMapping; this.renderer.toneMappingExposure = 2.0;
                 this.renderer.shadowMap.enabled = true;
                 document.body.appendChild(this.renderer.domElement);
@@ -395,13 +404,13 @@
                     cane: new THREE.MeshStandardMaterial({ map: Utils.createCandyCaneTexture(), roughness: 0.3 })
                 };
 
-                // --- FIXED COLOR DISTRIBUTION (Green & Gold Dominant) ---
+                // --- COLOR DISTRIBUTION ---
                 for (let i = 0; i < CONFIG.count.main; i++) {
                     let type, geo, mat; const r = Math.random();
-                    if (r < 0.10) { type='CANE'; geo=caneGeo; mat=mats.cane; } // 10% Cane
-                    else if (r < 0.50) { type='BOX'; geo=boxGeo; mat=mats.green; } // 40% Green Box
-                    else if (r < 0.85) { type=Math.random()>0.5?'BOX':'SPHERE'; geo=type==='BOX'?boxGeo:sphereGeo; mat=mats.gold; } // 35% Gold
-                    else { type='SPHERE'; geo=sphereGeo; mat=mats.redPhys; } // 15% Red Sphere
+                    if (r < 0.10) { type='CANE'; geo=caneGeo; mat=mats.cane; } 
+                    else if (r < 0.50) { type='BOX'; geo=boxGeo; mat=mats.green; } 
+                    else if (r < 0.85) { type=Math.random()>0.5?'BOX':'SPHERE'; geo=type==='BOX'?boxGeo:sphereGeo; mat=mats.gold; } 
+                    else { type='SPHERE'; geo=sphereGeo; mat=mats.redPhys; }
                     const obj = new Ornament(type, geo, mat);
                     this.mainGroup.add(obj.mesh); this.objects.push(obj);
                 }
@@ -409,7 +418,6 @@
                 const dGeo = new THREE.BufferGeometry();
                 const dPos = new Float32Array(CONFIG.count.dust * 3).map(() => (Math.random()-0.5)*90);
                 dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
-                // Tint dust gold
                 this.scene.add(new THREE.Points(dGeo, new THREE.PointsMaterial({ color: 0xffeebb, size: 0.2, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending })));
                 
                 const triggerGeo = new THREE.SphereGeometry(4, 16, 16);
@@ -420,14 +428,39 @@
 
             loadPreloadedPhotos() {
                 const loader = new THREE.TextureLoader(); let loadedCount = 0;
+                
+                // iOS Fail-safe: If photos fail to load or take too long, hide loader anyway after 6s
+                setTimeout(() => { 
+                    const l=document.getElementById('loader'); 
+                    if(l && l.style.opacity !== '0') {
+                        console.warn("Loader timeout triggered");
+                        l.style.opacity=0; 
+                        setTimeout(()=>l.remove(),1000);
+                    } 
+                }, 6000);
+
                 for(let i=1; i<=CONFIG.totalPhotos; i++) {
                     loader.load(`photos/${i}.jpg`, (tex) => {
                         tex.colorSpace = THREE.SRGBColorSpace; tex.center.set(0.5,0.5);
                         this.createPhotoFrame(tex); loadedCount++;
-                        if(loadedCount === CONFIG.totalPhotos) { setTimeout(() => { document.getElementById('loader').style.opacity = 0; setTimeout(() => document.getElementById('loader').remove(), 1500); }, 500); }
-                    }, undefined, () => console.warn(`Error loading ${i}.jpg`));
+                        if(loadedCount === CONFIG.totalPhotos) { 
+                            setTimeout(() => { 
+                                const l = document.getElementById('loader');
+                                if(l) { l.style.opacity = 0; setTimeout(() => l.remove(), 1500); }
+                            }, 500); 
+                        }
+                    }, undefined, () => {
+                        // Handle Error silently so app doesn't crash, but log it
+                        console.warn(`Error loading ${i}.jpg`);
+                        loadedCount++; // Increment anyway to prevent hanging
+                        if(loadedCount === CONFIG.totalPhotos) {
+                             setTimeout(() => { 
+                                const l = document.getElementById('loader');
+                                if(l) { l.style.opacity = 0; setTimeout(() => l.remove(), 1500); }
+                            }, 500);
+                        }
+                    });
                 }
-                setTimeout(() => { const l=document.getElementById('loader'); if(l){l.style.opacity=0; setTimeout(()=>l.remove(),1000);} }, 5000);
             }
 
             createPhotoFrame(tex) {
@@ -492,6 +525,8 @@
                     }
                 };
                 window.addEventListener('mousemove', e => handleInput(e.clientX/window.innerWidth, e.clientY/window.innerHeight));
+                
+                // Touch events for rotating the tree
                 window.addEventListener('touchmove', e => {
                     if(e.touches.length > 0) handleInput(e.touches[0].clientX/window.innerWidth, e.touches[0].clientY/window.innerHeight);
                 }, { passive: false });
